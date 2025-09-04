@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTurk Clone - Sign In & Register</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f6f6f6;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background-color: #232f3e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff9900;
+        }
+        
+        .logo span {
+            color: white;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background-color: #f5f5f5;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-bottom: 3px solid #ff9900;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            padding: 30px;
+        }
+        
+        .form-container {
+            display: none;
+        }
+        
+        .form-container.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            border-color: #ff9900;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(255, 153, 0, 0.2);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #777;
+            cursor: pointer;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff9900;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #e88a00;
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+        
+        .form-footer a {
+            color: #ff9900;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            color: #d93025;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .success-message {
+            color: #0f9d58;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .forgot-password {
+            display: block;
+            text-align: right;
+            margin-top: 5px;
+            color: #0066c0;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        .terms {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">MTurk<span>.com</span></div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" id="signin-tab">Sign In</div>
+            <div class="tab" id="register-tab">Create Account</div>
+        </div>
+        
+        <div class="tab-content">
+            <!-- Sign In Form -->
+            <div class="form-container active" id="signin-form">
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email or mobile phone number</label>
+                        <input type="text" id="email" name="email" required>
+                        <div class="error-message" id="email-error">Please enter a valid email or phone number</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="password" name="password" required>
+                            <button type="button" class="toggle-password" id="togglePassword">Show</button>
+                        </div>
+                        <div class="error-message" id="password-error">Your password must be at least 6 characters</div>
+                        <a href="#" class="forgot-password">Forgot your password?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn">Sign In</button>
+                    
+                    <div class="form-footer">
+                        <div class="success-message" id="login-success">Login successful! Redirecting...</div>
+                        <p>By continuing, you agree to MTurk's <a href="#">Conditions of Use</a> and <a href="#">Privacy Notice</a>.</p>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Registration Form -->
+            <div class="form-container" id="register-form">
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label for="name">Your name</label>
+                        <input type="text" id="name" name="name" required>
+                        <div class="error-message" id="name-error">Please enter your name</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" name="email" required>
+                        <div class="error-message" id="register-email-error">Please enter a valid email address</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <div class="password-container">
+                            <input type="password" id="register-password" name="password" required>
+                            <button type="button" class="toggle-password" id="toggleRegisterPassword">Show</button>
+                        </div>
+                        <div class="error-message" id="register-password-error">Passwords must be at least 6 characters</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-password">Re-enter password</label>
+                        <input type="password" id="confirm-password" name="confirm-password" required>
+                        <div class="error-message" id="confirm-password-error">Passwords do not match</div>
+                    </div>
+                    
+                    <button type="submit" class="btn">Create your MTurk account</button>
+                    
+                    <div class="form-footer">
+                        <div class="success-message" id="register-success">Account created successfully! Redirecting...</div>
+                        <p>Already have an account? <a href="#" id="go-to-signin">Sign in</a></p>
+                    </div>
+                    
+                    <div class="terms">
+                        <p>By creating an account, you agree to MTurk's <a href="#">Conditions of Use</a> and <a href="#">Privacy Notice</a>.</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching functionality
+            const signinTab = document.getElementById('signin-tab');
+            const registerTab = document.getElementById('register-tab');
+            const signinForm = document.getElementById('signin-form');
+            const registerForm = document.getElementById('register-form');
+            const goToSignin = document.getElementById('go-to-signin');
+            
+            signinTab.addEventListener('click', function() {
+                signinTab.classList.add('active');
+                registerTab.classList.remove('active');
+                signinForm.classList.add('active');
+                registerForm.classList.remove('active');
+            });
+            
+            registerTab.addEventListener('click', function() {
+                registerTab.classList.add('active');
+                signinTab.classList.remove('active');
+                registerForm.classList.add('active');
+                signinForm.classList.remove('active');
+            });
+            
+            goToSignin.addEventListener('click', function(e) {
+                e.preventDefault();
+                signinTab.click();
+            });
+            
+            // Password visibility toggle
+            const togglePassword = document.getElementById('togglePassword');
+            const toggleRegisterPassword = document.getElementById('toggleRegisterPassword');
+            const passwordInput = document.getElementById('password');
+            const registerPasswordInput = document.getElementById('register-password');
+            
+            togglePassword.addEventListener('click', function() {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    togglePassword.textContent = 'Hide';
+                } else {
+                    passwordInput.type = 'password';
+                    togglePassword.textContent = 'Show';
+                }
+            });
+            
+            toggleRegisterPassword.addEventListener('click', function() {
+                if (registerPasswordInput.type === 'password') {
+                    registerPasswordInput.type = 'text';
+                    toggleRegisterPassword.textContent = 'Hide';
+                } else {
+                    registerPasswordInput.type = 'password';
+                    toggleRegisterPassword.textContent = 'Show';
+                }
+            });
+            
+            // Form validation and submission
+            const loginForm = document.getElementById('loginForm');
+            const registerFormElement = document.getElementById('registerForm');
+            
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                let isValid = true;
+                
+                // Validate email
+                if (!email || !isValidEmail(email)) {
+                    document.getElementById('email-error').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('email-error').style.display = 'none';
+                }
+                
+                // Validate password
+                if (!password || password.length < 6) {
+                    document.getElementById('password-error').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('password-error').style.display = 'none';
+                }
+                
+                if (isValid) {
+                    // Simulate successful login
+                    document.getElementById('login-success').style.display = 'block';
+                    
+                    // In a real application, you would send this data to a server
+                    console.log('Login attempt with:', { email, password });
+                    
+                    // Redirect after a short delay (simulation)
+                    setTimeout(() => {
+                        alert('Login successful! Redirecting to dashboard...');
+                        // window.location.href = 'dashboard.html'; // Actual redirect in a real app
+                    }, 1500);
+                }
+            });
+            
+            registerFormElement.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+                let isValid = true;
+                
+                // Validate name
+                if (!name) {
+                    document.getElementById('name-error').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('name-error').style.display = 'none';
+                }
+                
+                // Validate email
+                if (!email || !isValidEmail(email)) {
+                    document.getElementById('register-email-error').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('register-email-error').style.display = 'none';
+                }
+                
+                // Validate password
+                if (!password || password.length < 6) {
+                    document.getElementById('register-password-error').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('register-password-error').style.display = 'none';
+                }
+                
+                // Validate password confirmation
+                if (password !== confirmPassword) {
+                    document.getElementById('confirm-password-error').style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById('confirm-password-error').style.display = 'none';
+                }
+                
+                if (isValid) {
+                    // Simulate successful registration
+                    document.getElementById('register-success').style.display = 'block';
+                    
+                    // In a real application, you would send this data to a server
+                    console.log('Registration attempt with:', { name, email, password });
+                    
+                    // Redirect after a short delay (simulation)
+                    setTimeout(() => {
+                        alert('Registration successful! Redirecting to dashboard...');
+                        // window.location.href = 'dashboard.html'; // Actual redirect in a real app
+                    }, 1500);
+                }
+            });
+            
+            // Helper function to validate email format
+            function isValidEmail(email) {
+                const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
+            
+            // Real-time validation
+            document.getElementById('email').addEventListener('input', function() {
+                if (isValidEmail(this.value)) {
+                    document.getElementById('email-error').style.display = 'none';
+                }
+            });
+            
+            document.getElementById('password').addEventListener('input', function() {
+                if (this.value.length >= 6) {
+                    document.getElementById('password-error').style.display = 'none';
+                }
+            });
+            
+            document.getElementById('register-email').addEventListener('input', function() {
+                if (isValidEmail(this.value)) {
+                    document.getElementById('register-email-error').style.display = 'none';
+                }
+            });
+            
+            document.getElementById('register-password').addEventListener('input', function() {
+                if (this.value.length >= 6) {
+                    document.getElementById('register-password-error').style.display = 'none';
+                }
+            });
+            
+            document.getElementById('confirm-password').addEventListener('input', function() {
+                const password = document.getElementById('register-password').value;
+                if (this.value === password) {
+                    document.getElementById('confirm-password-error').style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
